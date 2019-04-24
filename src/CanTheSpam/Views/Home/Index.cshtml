@@ -2,29 +2,64 @@
     ViewData["Title"] = "Home Page";
 }
 
-      
 
- 
-    <img src="~/images/CanTheSpam.jpg" alt="Can The Spam Logo" class="mx-auto d-block" />   
 
-    <div class="text-center">
-        <h1 class="display-4">Welcome</h1>
-    </div>
 
-    <div class="text-center">
-        Please select what type of email you with be entering.
-    </div>
+<img src="~/images/CanTheSpam.jpg" alt="Can The Spam Logo" class="mx-auto d-block" />
 
-    <div class="row">
-        <div class="col-md-6 text-center">
-            <button type="button" class="btn btn-primary">Personal</button>
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+</div>
+
+<div class="text-center">
+    Please select what type of email you with be entering.
+</div>
+
+<div class="row">
+    <div class="col-md-6 text-center">
+        <form action="/action_page.php" class="needs-validation" novalidate>
+            @*<button type="button" class="btn btn-primary">Personal</button>*@
             @*@Html.ActionLink("Personal Email", "index", "home", null, new { @class = "btn btn-primary", role = "button" })*@
-            <a class="btn btn-primary" asp-area="" asp-controller="Home" asp-action="Index">Personal Email</a>
-        </div>
-
-        <div class="col-md-6 text-center">
-            <button type="button" class="btn btn-primary" disabled>Business</button>
-        </div>
-
+            @*<a class="btn btn-primary" asp-area="" asp-controller="Home" asp-action="Index">Personal Email</a>*@
+            <div class="form-group">
+                <label for="email">
+                    This section is not intended for Business use. Please enter your personal email:
+                </label>
+                <input type="email" class="form-control" id="email" placeholder="Enter Email" name="email" required />
+                <div class="valid-feedback">
+                    Valid
+                </div>
+                <div class="invalid-feedback">
+                    Please Fill out this field.
+                </div>
+            </div>
+            <a class="btn btn-primary" asp-area="" asp-controller="Home" asp-action="Index">Submit</a>
+        </form>
     </div>
 
+    <div class="col-md-6 text-center">
+        <button type="button" class="btn btn-primary" disabled>Business</button>
+    </div>
+
+</div>
+
+<script>
+    // Disable form submissions if there are invalid fields
+    (function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            // Get the forms we want to add validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
