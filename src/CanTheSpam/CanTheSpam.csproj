@@ -5,13 +5,38 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
     <UserSecretsId>ff3a6f29-64e4-4cb8-8e32-0be8c903af87</UserSecretsId>
+    <RootNamespace>CanTheSpam</RootNamespace>
+    <Configurations>Debug;Release;Docker;Azure</Configurations>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="appsettings.Azure.json" />
+    <Content Remove="appsettings.Debug.json" />
+    <Content Remove="appsettings.Docker.json" />
+    <Content Remove="appsettings.Release.json" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="Views\Home\CanTheSpam.jpg" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="appsettings.Azure.json">
+      <IsTransformFile>true</IsTransformFile>
+      <DependentUpon>appsettings.json</DependentUpon>
+    </None>
+    <None Include="appsettings.Debug.json">
+      <IsTransformFile>true</IsTransformFile>
+      <DependentUpon>appsettings.json</DependentUpon>
+    </None>
+    <None Include="appsettings.Docker.json">
+      <IsTransformFile>true</IsTransformFile>
+      <DependentUpon>appsettings.json</DependentUpon>
+    </None>
+    <None Include="appsettings.Release.json">
+      <IsTransformFile>true</IsTransformFile>
+      <DependentUpon>appsettings.json</DependentUpon>
+    </None>
     <None Include="wwwroot\css\Matrix.jpg" />
     <None Include="wwwroot\images\CanTheSpam.jpg" />
   </ItemGroup>
@@ -19,13 +44,20 @@
 
   <ItemGroup>
     <PackageReference Include="bootstrap" Version="4.3.1" />
-    <PackageReference Include="EntityFramework" Version="6.2.0" />
     <PackageReference Include="jQuery" Version="3.3.1" />
     <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.4" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.5.4" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <TransformOnBuild>true</TransformOnBuild>
+    </Content>
   </ItemGroup>
 
 </Project>
