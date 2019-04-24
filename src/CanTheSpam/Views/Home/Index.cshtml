@@ -18,6 +18,8 @@
     <div class="row">
         <div class="col-md-6 text-center">
             <button type="button" class="btn btn-primary">Personal</button>
+            @*@Html.ActionLink("Personal Email", "index", "home", null, new { @class = "btn btn-primary", role = "button" })*@
+            <a class="btn btn-primary" asp-area="" asp-controller="Home" asp-action="Index">Personal Email</a>
         </div>
 
         <div class="col-md-6 text-center">
