@@ -1,4 +1,5 @@
 ﻿using CanTheSpam.Data;
+using CanTheSpam.Data.CanTheSpamRepository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -42,7 +43,11 @@ namespace CanTheSpam
          });
 
          services.AddDbContext<UserDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("AppConnection")));
+         services.AddDbContext<CanTheSpamContext>(options => options.UseSqlServer(Configuration.GetConnectionString("AppConnection")));
          services.AddDbContext<Log4NetDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Log4NetConnection")));
+
+         //         kernel.Bind<IUnitOfWork>().To<CustomerMgrContext>().InRequestScope();
+
 
          services.AddDefaultIdentity<IdentityUser>()
             .AddDefaultUI(UIFramework.Bootstrap4)

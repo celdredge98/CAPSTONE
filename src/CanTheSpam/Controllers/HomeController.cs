@@ -3,21 +3,35 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using CanTheSpam.Models;
 using System.Threading.Tasks;
+using CanTheSpam.Data.CanTheSpamRepository;
+using CanTheSpam.Data.CanTheSpamRepository.Models;
+using CanTheSpam.Data.Repository.Interfaces;
 
 namespace CanTheSpam.Controllers
 {
    public class HomeController : Controller
    {
+      private CanTheSpamContext _context;
       private readonly ILogger<HomeController> _logger;
 
-      public HomeController(ILogger<HomeController> logger)
+      public HomeController(ILogger<HomeController> logger, IUnitOfWork appData)
       {
          _logger = logger;
+         _context = (CanTheSpamContext)appData;
       }
 
       public IActionResult Index()
       {
          _logger.LogDebug($"{GetType().Name}.{nameof(Index)} method called...");
+
+         EmailList emailListItem = new EmailList();
+
+         _context.EmailList.Add(emailListItem);
+         _context.Save();
+
+         _context.EmailList.GetEntityByEmail("");
+
+         //_context.EmailList
 
          return View();
       }
