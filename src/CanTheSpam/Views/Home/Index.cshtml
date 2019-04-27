@@ -1,4 +1,5 @@
-﻿@model CanTheSpam.Models.UserEmailDetails
+﻿@using CanTheSpam.Data.CanTheSpamRepository.Models
+@model CanTheSpam.Models.UserEmailDetails
 
 @{
     ViewData["Title"] = "Home Page";
@@ -6,7 +7,8 @@
 
 <img src="~/images/CanTheSpam.jpg" alt="Can The Spam Logo" class="mx-auto d-block" />
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
+   <h1 class="display-4">Welcome</h1>
+   <h2>Example from Database = @ViewData["EmailItem"]</h2>
 </div>
 
 <div class="text-center">

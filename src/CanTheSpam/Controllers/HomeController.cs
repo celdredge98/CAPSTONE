@@ -1,9 +1,11 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using CanTheSpam.Models;
 using System.Threading.Tasks;
 using CanTheSpam.Data.CanTheSpamRepository;
+using CanTheSpam.Data.CanTheSpamRepository.Interfaces;
 using CanTheSpam.Data.CanTheSpamRepository.Models;
 using CanTheSpam.Data.Repository.Interfaces;
 
@@ -11,27 +13,32 @@ namespace CanTheSpam.Controllers
 {
    public class HomeController : Controller
    {
-      private CanTheSpamContext _context;
+      private readonly IUnitOfWork _unitOfWork;
+      private readonly IEmailListRepository _emailListRepository;
+
       private readonly ILogger<HomeController> _logger;
 
-      public HomeController(ILogger<HomeController> logger, IUnitOfWork appData)
+      public HomeController(ILogger<HomeController> logger, IUnitOfWork unitOfWork)
       {
          _logger = logger;
-         _context = (CanTheSpamContext)appData;
+         _unitOfWork = unitOfWork;
+         _emailListRepository = new EmailListRepository(_unitOfWork);
       }
 
       public IActionResult Index()
       {
          _logger.LogDebug($"{GetType().Name}.{nameof(Index)} method called...");
 
-         EmailList emailListItem = new EmailList();
+         EmailList emailListItem = new EmailList()
+         {
+            Id = Guid.NewGuid(),
+            Email = $"{Guid.NewGuid().ToString()}@example.com"
+         };
 
-         _context.EmailList.Add(emailListItem);
-         _context.Save();
+         _emailListRepository.Add(emailListItem);
+         _unitOfWork.Save();
 
-         _context.EmailList.GetEntityByEmail("");
-
-         //_context.EmailList
+         ViewData["EmailItem"] = _emailListRepository.GetEntityByEmail(emailListItem.Email).Email;
 
          return View();
       }

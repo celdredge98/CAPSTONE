@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using CanTheSpam.Data.Repository.Interfaces;
 using log4net;
 using Microsoft.EntityFrameworkCore;
@@ -14,21 +12,12 @@ namespace CanTheSpam.Data.CanTheSpamRepository
    public class CanTheSpamContext : CanTheSpamContainer, IUnitOfWork
    {
       private static readonly ILog _logger = LogManager.GetLogger(typeof(CanTheSpamContext));
-
-
+      
       public CanTheSpamContext(DbContextOptions<CanTheSpamContainer> options) : base(options)
-      {
-      }
+      { }
 
-      protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+      public CanTheSpamContext() : base()
       {
-         if (!optionsBuilder.IsConfigured)
-         {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-            optionsBuilder.UseSqlServer(@"data source=localhost;initial catalog=CanTheSpamAppData;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework");
-         }
-
-         base.OnConfiguring(optionsBuilder);
       }
 
       public override int SaveChanges()

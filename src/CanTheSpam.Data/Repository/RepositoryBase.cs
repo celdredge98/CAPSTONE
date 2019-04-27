@@ -11,6 +11,7 @@ namespace CanTheSpam.Data.Repository
    {
       private static readonly ILog _logger = LogManager.GetLogger(typeof(RepositoryBase<TDbContext>));
 
+      // ReSharper disable once InconsistentNaming
       protected readonly TDbContext _context;
 
       /// <summary>

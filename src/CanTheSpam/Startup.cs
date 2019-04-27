@@ -1,5 +1,7 @@
-﻿using CanTheSpam.Data;
+﻿using System.Reflection;
+using CanTheSpam.Data;
 using CanTheSpam.Data.CanTheSpamRepository;
+using CanTheSpam.Data.Repository.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -12,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using CanTheSpam.Log4Net.Data;
 using CanTheSpam.Log4Net.Extensions;
+using CanTheSpam.Data.CanTheSpamRepository.Interfaces;
 
 namespace CanTheSpam
 {
@@ -42,12 +45,25 @@ namespace CanTheSpam
             options.MinimumSameSitePolicy = SameSiteMode.None;
          });
 
-         services.AddDbContext<UserDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("AppConnection")));
-         services.AddDbContext<CanTheSpamContext>(options => options.UseSqlServer(Configuration.GetConnectionString("AppConnection")));
          services.AddDbContext<Log4NetDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Log4NetConnection")));
+         services.AddDbContext<UserDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("AppConnection")));
+         //services.AddDbContext<CanTheSpamContext>(options => options.UseSqlServer(Configuration.GetConnectionString("AppConnection")));
 
-         //         kernel.Bind<IUnitOfWork>().To<CustomerMgrContext>().InRequestScope();
+         services.AddEntityFrameworkSqlServer()
+            .AddDbContext<CanTheSpamContext>(options =>
+               {
+                  options.UseSqlServer(Configuration.GetConnectionString("AppConnection"),
+                     sqlOptions => sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().
+                        Assembly.GetName().Name));
+               },
+               // Note that Scoped is the default choice in AddDbContext. It is shown here only for pedagogic purposes.
+               ServiceLifetime.Scoped
+            );
 
+         services.AddScoped<IUnitOfWork, CanTheSpamContext>(
+            sp => new CanTheSpamContext(
+               new DbContextOptionsBuilder<CanTheSpamContainer>()
+                  .UseSqlServer(Configuration.GetConnectionString("AppConnection")).Options));
 
          services.AddDefaultIdentity<IdentityUser>()
             .AddDefaultUI(UIFramework.Bootstrap4)
@@ -103,7 +119,7 @@ namespace CanTheSpam
 
          app.UseMvc(routes =>
          {
-            routes.MapRoute(name: "default",template: "{controller=Home}/{action=Index}/{id?}");
+            routes.MapRoute(name: "default", template: "{controller=Home}/{action=Index}/{id?}");
          });
       }
    }

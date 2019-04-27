@@ -5,6 +5,10 @@ namespace CanTheSpam.Data.CanTheSpamRepository
 {
    public partial class CanTheSpamContainer : DbContext
    {
+      public CanTheSpamContainer()
+      {
+      }
+
       public CanTheSpamContainer(DbContextOptions<CanTheSpamContainer> options)
           : base(options)
       {
@@ -166,6 +170,5 @@ namespace CanTheSpam.Data.CanTheSpamRepository
                 .IsUnicode(false);
          });
       }
-
    }
 }
