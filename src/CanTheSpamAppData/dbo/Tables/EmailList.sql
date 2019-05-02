@@ -1,8 +1,10 @@
 ﻿CREATE TABLE [dbo].[EmailList]
 (
-   [Id]        UNIQUEIDENTIFIER  NOT NULL DEFAULT NewId(),
-   [Email]     VARCHAR(256)      NOT NULL,
-   CONSTRAINT [PK_dbo.EmailList] PRIMARY KEY CLUSTERED ([Id] ASC)
+   [Id]           UNIQUEIDENTIFIER  NOT NULL DEFAULT NewId(),
+   [Email]        VARCHAR(256)      NOT NULL,
+   [IsValidated]  BIT               NOT NULL DEFAULT 0, 
+   [DateCreated]  DATETIME          NOT NULL DEFAULT GetUtcDate(), 
+    CONSTRAINT [PK_dbo.EmailList] PRIMARY KEY CLUSTERED ([Id] ASC)
       WITH 
       (
          PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON

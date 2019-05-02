@@ -7,8 +7,7 @@
 
 <img src="~/images/CanTheSpam.jpg" alt="Can The Spam Logo" class="mx-auto d-block" />
 <div class="text-center">
-   <h1 class="display-4">Welcome</h1>
-   <h2>Example from Database = @ViewData["EmailItem"]</h2>
+    <h1 class="display-4">Welcome</h1>
 </div>
 
 <div class="text-center">
@@ -16,8 +15,34 @@
 </div>
 
 <div class="row">
+    <div class="col-md-12">
+        <div class="jumbotron-fluid">
+            <h1 class="display-4">@ViewData["Title"]</h1>
+            <p><strong style="font-size: 10pt">The National Do Not Email Registry gives you a choice about whether to receive marketing emails!</strong></p>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <p>
+            Cans the Spam is a grass roots effort to provide organizations, companies, and individuals a way to determine if the email address they have wishes not to receive
+            email advertisements or unsolicited emails. This site is not affiliated with the government or any other agency.
+        </p>
+        <p>You can register your email address for free.</p>
+        <p>After you register, other types of organizations may still email you, such as charities, political groups, debt collectors and surveys.</p>
+        <p>
+            If you received an unwanted email after registering here are a few things you can do.
+            <ul>
+                <li>Look for a link in the email to "unsubscribe" and use it to have yourself removed from their email list.</li>
+                <li>Email customer support and ask them to use this service to validate email addresses.</li>
+            </ul>
+        </p>
+    </div>
+</div>
+
+<div class="row">
     <div class="col-md-6 text-center">
-        <form asp-controller="Home" asp-action="ValidateEmail" method="post">
+        <form asp-controller="Home" asp-action="EmailCapture" method="post">
             <div class="form-group row">
                 <label asp-for="Email" class="col-sm-2 col-form-label">Your Email</label>
                 <div class="col-sm-12">

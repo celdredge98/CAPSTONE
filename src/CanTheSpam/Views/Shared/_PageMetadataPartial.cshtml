@@ -1,0 +1,22 @@
+@{
+   string currentUrl = $"{(Context.Request.IsHttps ? "https://" : "http://")}{Context.Request.Host}{Context.Request.Path}";
+}
+
+@*ToDo: Research and utilize: http://ogp.me/*@
+@*ToDo: Research and utilize: https://css-tricks.com/essential-meta-tags-social-media/*@
+<meta property="og:type" content="website" />
+<meta property="og:url" content="@currentUrl" />
+<meta property="og:site_name" content="CansTheSpam" />
+<meta property="og:description" content="Add your email address to let companies know you don't want spam coming to your inbox. Report offenders of the CanSpam Act 2003. This registry list is privately operated." />
+
+<meta http-equiv="Reply-to" content="support@CansTheSpam.com">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Language" content="en-us">
+<meta name="DESCRIPTION" content="Add your email address to let companies know you don't want spam coming to your inbox. Report offenders of the CanSpam Act 2003. This registry list is privately operated.">
+<meta name="KEYWORDS" content="Can the Spam, Email, List, Do Not Contact, Email List, Register, National Do Not Email, Voluntary, Can Spam Act 2003">
+<meta name="Robots" content="Follow, Index">
+<meta name="Copyright" content="Cody Eldredge, @DateTime.Now.Year">
+<meta name="Distribution" content="Worldwide">
+<meta name="Rating" content="General">
+<meta name="revisit-after" content="30 days">
+<link rel="alternate" hreflang="x-default" href="https://www.CansTheSpam.com/" />

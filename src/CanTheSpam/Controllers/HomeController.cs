@@ -8,6 +8,7 @@ using CanTheSpam.Data.CanTheSpamRepository;
 using CanTheSpam.Data.CanTheSpamRepository.Interfaces;
 using CanTheSpam.Data.CanTheSpamRepository.Models;
 using CanTheSpam.Data.Repository.Interfaces;
+using CanTheSpam.Extensions;
 
 namespace CanTheSpam.Controllers
 {
@@ -29,17 +30,6 @@ namespace CanTheSpam.Controllers
       {
          _logger.LogDebug($"{GetType().Name}.{nameof(Index)} method called...");
 
-         EmailList emailListItem = new EmailList()
-         {
-            Id = Guid.NewGuid(),
-            Email = $"{Guid.NewGuid().ToString()}@example.com"
-         };
-
-         _emailListRepository.Add(emailListItem);
-         _unitOfWork.Save();
-
-         ViewData["EmailItem"] = _emailListRepository.GetEntityByEmail(emailListItem.Email).Email;
-
          return View();
       }
 
@@ -55,8 +45,17 @@ namespace CanTheSpam.Controllers
       {
          _logger.LogDebug($"{GetType().Name}.{nameof(Privacy)} method called...");
 
-         ViewData["Email"] = userEmail.Email;
+         // Form post control handler
 
+         if (!string.IsNullOrEmpty(userEmail?.Email))
+         {
+            // if userEmail.Email = "RandomValue@example.com" not in the database "emailItem" == null
+            EmailList emailItem = _emailListRepository.GetEntityByEmail(userEmail.Email);
+            if (emailItem != null)
+            {
+               ViewData["Email"] = emailItem.Email;
+            }
+         }
          // Check for robots using captcha
          //    IF Not Robot continue on
          //    ELSE Robot Goto I hate robot's page --> Page redirect -- Log IP Address, Log in Robot submitted Email table
@@ -66,19 +65,59 @@ namespace CanTheSpam.Controllers
          // User can use the link from email to validate and then it redirects to "Thank you page"
          // or user can enter the code on this page (Validate) page and then goto "Thank you page"
 
-         // https://CansTheSpam.com/ValidateEmail?e=user@example.com&v=37AB7F39-CC4D-40DC-B113-DA9452501B1D ([HttpGet])
-         // https://CansTheSpam.com/ValidateEmail/?e=user@example.com&v=37AB7F39-CC4D-40DC-B113-DA9452501B1D ([HttpGet])
-
          return View();
       }
 
       [HttpGet]
       public IActionResult ValidateEmail([FromQuery] string e, [FromQuery] string v)
       {
+         _logger.LogDebug($"{GetType().Name}.{nameof(ValidateEmail)} method called...");
+
+         // get control handler
+
+         if (!string.IsNullOrEmpty(e))
+         {
+            // https://CansTheSpam.com/ValidateEmail?e=user@example.com&v=37AB7F39-CC4D-40DC-B113-DA9452501B1D ([HttpGet])
+            // https://CansTheSpam.com/ValidateEmail/?e=user@example.com&v=37AB7F39-CC4D-40DC-B113-DA9452501B1D ([HttpGet])
+
+            EmailList emailItem = _emailListRepository.GetEntityByEmail(e);
+            ViewData["Email"] = emailItem.Email;
+         }
          // IF email link used and is valid automatically redirect to "Thank You" page
          // ELSE stay on page and report error to use that it failed to validate and try again.
 
          return View();
+      }
+
+      [HttpPost]
+      public IActionResult EmailCapture(UserEmailDetails userEmail)
+      {
+          _logger.LogDebug($"{GetType().Name}.{nameof(EmailCapture)} method called...");
+
+          if (!string.IsNullOrEmpty(userEmail?.Email))
+          {
+                EmailList emailListItem = new EmailList()
+                {
+                    Id = Guid.NewGuid(),
+                    Email = userEmail.Email,
+                    IsValidated = false,
+                    DateCreated = DateTime.UtcNow
+                };
+
+                _emailListRepository.Add(emailListItem);
+                _unitOfWork.Save();
+
+            }
+
+            return View();
+      }
+
+      [HttpGet]
+      public IActionResult ThankYou([FromQuery] string e)
+      {
+          _logger.LogDebug($"{GetType().Name}.{nameof(ThankYou)} method called...");
+
+          return View();
       }
 
       [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
