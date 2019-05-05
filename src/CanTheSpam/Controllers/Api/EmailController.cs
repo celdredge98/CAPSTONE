@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net;
+using System.Threading.Tasks;
 using CanTheSpam.Controllers.Web;
 using CanTheSpam.Data.CanTheSpamRepository;
 using CanTheSpam.Data.CanTheSpamRepository.Interfaces;
@@ -15,21 +16,34 @@ namespace CanTheSpam.Controllers.Api
       private readonly IUnitOfWork _unitOfWork;
       private readonly IEmailListRepository _emailListRepository;
 
-      private readonly ILogger<HomeController> _logger;
+      private readonly ILogger<EmailController> _logger;
 
-      public EmailController(ILogger<HomeController> logger, IUnitOfWork unitOfWork)
+      public EmailController(ILogger<EmailController> logger, IUnitOfWork unitOfWork)
       {
          _logger = logger;
          _unitOfWork = unitOfWork;
          _emailListRepository = new EmailListRepository(_unitOfWork);
       }
 
-      // GET: api/Email/5
-      [HttpGet("{email}", Name = "Email")]
+      [HttpGet]
       [Route("Validate")]
-      public Task<IActionResult> GetAsync(string email)
+      public async Task<IActionResult> GetAsync([FromQuery]string email, [FromQuery]string apiKey)
       {
-         return null;
+         if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(apiKey))
+         {
+            return await Task.Run(() => Ok(new {Email = email, ApiKey = apiKey, Status = "Exclude"}));
+         }
+         // look up API key in database
+         // if not found
+         //    return error (Access Denied)
+         //else
+         //    look up record in database
+         //    if found
+         //       return result
+         //    else
+         //       return Not found
+
+         return await Task.Run(() => StatusCode((int) HttpStatusCode.BadRequest, new {Email = email, ApiKey = apiKey, Status = string.Empty}));
       }
    }
 }
