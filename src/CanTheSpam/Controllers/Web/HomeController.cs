@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using CanTheSpam.Data.CanTheSpamRepository;
 using CanTheSpam.Data.CanTheSpamRepository.Interfaces;
 using CanTheSpam.Data.CanTheSpamRepository.Models;
@@ -7,6 +8,7 @@ using CanTheSpam.Data.Repository.Interfaces;
 using CanTheSpam.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using reCAPTCHA.AspNetCore;
 
 namespace CanTheSpam.Controllers.Web
 {
@@ -14,12 +16,16 @@ namespace CanTheSpam.Controllers.Web
    {
       private readonly IUnitOfWork _unitOfWork;
       private readonly IEmailListRepository _emailListRepository;
+      private readonly IRecaptchaService _recaptcha;
 
       private readonly ILogger<HomeController> _logger;
 
-      public HomeController(ILogger<HomeController> logger, IUnitOfWork unitOfWork)
+      public HomeController(ILogger<HomeController> logger,
+         IRecaptchaService recaptcha,
+         IUnitOfWork unitOfWork)
       {
          _logger = logger;
+         _recaptcha = recaptcha;
          _unitOfWork = unitOfWork;
          _emailListRepository = new EmailListRepository(_unitOfWork);
       }
@@ -61,19 +67,27 @@ namespace CanTheSpam.Controllers.Web
       }
 
       [HttpPost]
-      public IActionResult ValidateEmail(UserEmailDetails userEmail)
+      public async Task<IActionResult> ValidateEmail(UserEmailDetails userEmail)
       {
          _logger.LogDebug($"{GetType().Name}.{nameof(ValidateEmail)}-Post method called...");
 
-         // Form post control handler
+         RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
 
-         if (!string.IsNullOrEmpty(userEmail?.Email))
+         if (!recaptcha.success)
          {
-            // if userEmail.Email = "RandomValue@example.com" not in the database "emailItem" == null
-            EmailList emailItem = _emailListRepository.GetEntityByEmail(userEmail.Email);
-            if (emailItem != null)
+            ViewData["Email"] = $"{userEmail.Email} - Success: {recaptcha.success}";
+            ModelState.AddModelError("", "There was an error validating recatpcha. Please try again!");
+         }
+         else
+         {
+            if (!string.IsNullOrEmpty(userEmail?.Email))
             {
-               ViewData["Email"] = emailItem.Email;
+               // if userEmail.Email = "RandomValue@example.com" not in the database "emailItem" == null
+               EmailList emailItem = _emailListRepository.GetEntityByEmail(userEmail.Email);
+               if (emailItem != null)
+               {
+                  ViewData["Email"] = $"{emailItem.Email} - Success: {recaptcha.success}";
+               }
             }
          }
          // Check for robots using captcha
@@ -110,23 +124,41 @@ namespace CanTheSpam.Controllers.Web
       }
 
       [HttpPost]
-      public IActionResult EmailCapture(UserEmailDetails userEmail)
+      public async Task<IActionResult> EmailCapture(UserEmailDetails userEmail)
       {
          _logger.LogDebug($"{GetType().Name}.{nameof(EmailCapture)} method called...");
 
-         if (!string.IsNullOrEmpty(userEmail?.Email))
+         RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
+
+         if (!recaptcha.success)
          {
-            EmailList emailListItem = new EmailList()
+            ViewData["Email"] = $"{userEmail.Email} - Success: {recaptcha.success}";
+            ModelState.AddModelError("", "There was an error validating recatpcha. Please try again!");
+         }
+         else
+         {
+            if (!string.IsNullOrEmpty(userEmail?.Email))
             {
-               Id = Guid.NewGuid(),
-               Email = userEmail.Email,
-               IsValidated = false,
-               DateCreated = DateTime.UtcNow
-            };
+               if (userEmail != null)
+               {
+                  if (!string.IsNullOrEmpty(userEmail?.Email))
+                  {
+                     EmailList emailListItem = new EmailList()
+                     {
+                        Id = Guid.NewGuid(),
+                        Email = userEmail.Email,
+                        IsValidated = false,
+                        DateCreated = DateTime.UtcNow
+                     };
 
-            _emailListRepository.Add(emailListItem);
-            _unitOfWork.Save();
+                     _emailListRepository.Add(emailListItem);
+                     _unitOfWork.Save();
 
+                  }
+
+                  ViewData["Email"] = $"{userEmail.Email} - Success: {recaptcha.success}";
+               }
+            }
          }
 
          return View();

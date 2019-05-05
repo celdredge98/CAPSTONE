@@ -1,5 +1,8 @@
-﻿@using CanTheSpam.Data.CanTheSpamRepository.Models
+﻿@using Microsoft.Extensions.Options
+@using reCAPTCHA.AspNetCore
+
 @model CanTheSpam.Models.UserEmailDetails
+@inject IOptions<RecaptchaSettings> RecaptchaSettings
 
 @{
    ViewData["Title"] = "Home Page";
@@ -18,7 +21,7 @@
       <p>Verify Your Registration</p>
    </div>
    <div class="col-4 col-sm-4 col-md-4 col-lg-4 col-xl-4">
-      <p>Register you Email Address</p>
+      <p>Register your Email Address</p>
    </div>
 </div>
 <div class="row">
@@ -34,10 +37,12 @@
             <input id="UserEmail" type="email" class="form-control" asp-for="Email" required placeholder="email@example.com" data-val-required="Invalid Email Address" data-val="true" />
             &nbsp;&nbsp;
             <input type="submit" id="btnSubmit" class="btn btn-primary" value="Submit" />
+            @Html.Recaptcha(RecaptchaSettings.Value)
          </form>
       </div>
    </div>
 </div>
+
 <div class="row">
    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
       <p>

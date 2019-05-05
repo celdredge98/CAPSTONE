@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using CanTheSpam.Log4Net.Data;
 using CanTheSpam.Log4Net.Extensions;
 using CanTheSpam.Data.CanTheSpamRepository.Interfaces;
+using reCAPTCHA.AspNetCore;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace CanTheSpam
@@ -23,7 +24,7 @@ namespace CanTheSpam
    {
       public IConfiguration Configuration { get; }
       public IHostingEnvironment Environment { get; }
-
+      
       public Startup(IHostingEnvironment env)
       {
          IConfigurationBuilder builder = new ConfigurationBuilder()
@@ -66,7 +67,10 @@ namespace CanTheSpam
                new DbContextOptionsBuilder<CanTheSpamContainer>()
                   .UseSqlServer(Configuration.GetConnectionString("AppConnection")).Options));
 
-         services.AddDefaultIdentity<IdentityUser>()
+         services.Configure<RecaptchaSettings>(Configuration.GetSection("RecaptchaSettings"));
+         services.AddTransient<IRecaptchaService, RecaptchaService>();
+
+            services.AddDefaultIdentity<IdentityUser>()
             .AddDefaultUI(UIFramework.Bootstrap4)
             .AddEntityFrameworkStores<UserDbContext>();
 

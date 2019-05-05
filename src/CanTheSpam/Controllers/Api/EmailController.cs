@@ -4,6 +4,7 @@ using CanTheSpam.Controllers.Web;
 using CanTheSpam.Data.CanTheSpamRepository;
 using CanTheSpam.Data.CanTheSpamRepository.Interfaces;
 using CanTheSpam.Data.Repository.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -11,6 +12,7 @@ namespace CanTheSpam.Controllers.Api
 {
    [Route("api/[controller]")]
    [ApiController]
+   //[Authorize]
    public class EmailController : ControllerBase
    {
       private readonly IUnitOfWork _unitOfWork;
@@ -29,10 +31,13 @@ namespace CanTheSpam.Controllers.Api
       [Route("Validate")]
       public async Task<IActionResult> GetAsync([FromQuery]string email, [FromQuery]string apiKey)
       {
+         _logger.LogDebug($"{GetType().Name}.{nameof(GetAsync)} method called...");
+
          if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(apiKey))
          {
             return await Task.Run(() => Ok(new {Email = email, ApiKey = apiKey, Status = "Exclude"}));
          }
+
          // look up API key in database
          // if not found
          //    return error (Access Denied)
