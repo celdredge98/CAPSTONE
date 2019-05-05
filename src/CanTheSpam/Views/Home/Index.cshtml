@@ -2,54 +2,56 @@
 @model CanTheSpam.Models.UserEmailDetails
 
 @{
-    ViewData["Title"] = "Home Page";
+   ViewData["Title"] = "Home Page";
 }
 
-<img src="~/images/CanTheSpam.jpg" alt="Can The Spam Logo" class="mx-auto d-block" />
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-</div>
-
-<div class="text-center">
-    Please select what type of email you with be entering.
-</div>
-
 <div class="row">
-    <div class="col-md-12">
-        <div class="jumbotron-fluid">
-            <h1 class="display-4">@ViewData["Title"]</h1>
-            <p><strong style="font-size: 10pt">The National Do Not Email Registry gives you a choice about whether to receive marketing emails!</strong></p>
-        </div>
-    </div>
+   <div style="max-height: 200px;" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 text-center text-sm-center text-md-center text-lg-center text-xl-center">
+      <img id="CanTheSpamLogo" src="~/images/CanTheSpam.jpg" alt="Can The Spam Logo" title="Can The Spam" class="img-fluid" style="max-height: 160px; max-width: 160px;" />
+   </div>
 </div>
 <div class="row">
-    <div class="col-md-12">
-        <p>
-            Cans the Spam is a grass roots effort to provide organizations, companies, and individuals a way to determine if the email address they have wishes not to receive
-            email advertisements or unsolicited emails. This site is not affiliated with the government or any other agency.
-        </p>
-        <p>You can register your email address for free.</p>
-        <p>After you register, other types of organizations may still email you, such as charities, political groups, debt collectors and surveys.</p>
-        <p>
-            If you received an unwanted email after registering here are a few things you can do.
-            <ul>
-                <li>Look for a link in the email to "unsubscribe" and use it to have yourself removed from their email list.</li>
-                <li>Email customer support and ask them to use this service to validate email addresses.</li>
-            </ul>
-        </p>
-    </div>
+   <div class="col-4 col-sm-4 col-md-4 col-lg-4 col-xl-4">
+      <p>Report Unwanted Email</p>
+   </div>
+   <div class="col-4 col-sm-4 col-md-4 col-lg-4 col-xl-4">
+      <p>Verify Your Registration</p>
+   </div>
+   <div class="col-4 col-sm-4 col-md-4 col-lg-4 col-xl-4">
+      <p>Register you Email Address</p>
+   </div>
 </div>
-
 <div class="row">
-    <div class="col-md-6 text-center">
-        <form asp-controller="Home" asp-action="EmailCapture" method="post">
-            <div class="form-group row">
-                <label asp-for="Email" class="col-sm-2 col-form-label">Your Email</label>
-                <div class="col-sm-12">
-                    <input id="UserEmail" type="email" class="form-control" asp-for="Email" required placeholder="email@example.com" data-val-required="Invalid Email Address" data-val="true" />
-                </div>
-                <input type="submit" id="btnSubmit" class="btn btn-primary mb-2" value="Add Email to List" />
-            </div>
-        </form>
-    </div>
+   <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 text-center text-sm-center text-md-center text-lg-center text-xl-center">
+      <p style="font-size: x-large; font-weight: bolder;">The Do Not Email Registry gives you a chance to have your voice heard about whether to receive email solicitations!</p>
+   </div>
+</div>
+<div class="row">
+   <div class="col-4 col-sm-4 col-md-4 col-lg-4 col-xl-4 offset-4 offset-sm-4 offset-md-4 offset-lg-4 offset-xl-4">
+      <div class="form-group">
+         <form class="form-inline" asp-controller="Home" asp-action="EmailCapture" method="post">
+            <label asp-for="Email" style="font-size: x-large; font-weight: bolder;" class="col-form-label">Email:&nbsp;&nbsp;</label>
+            <input id="UserEmail" type="email" class="form-control" asp-for="Email" required placeholder="email@example.com" data-val-required="Invalid Email Address" data-val="true" />
+            &nbsp;&nbsp;
+            <input type="submit" id="btnSubmit" class="btn btn-primary" value="Submit" />
+         </form>
+      </div>
+   </div>
+</div>
+<div class="row">
+   <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+      <p>
+         Cans the Spam is a grass roots effort to provide organizations, companies, and individuals a way to determine if the email address they have wishes not to receive
+         email advertisements or unsolicited emails. This site is not affiliated with the government or any other agency.
+      </p>
+      <p>You can register your email address for free.</p>
+      <p>After you register, other types of organizations may still email you, such as charities, political groups, debt collectors and surveys.</p>
+      <p>
+         If you received an unwanted email after registering here are a few things you can do.
+         <ul>
+            <li>Look for a link in the email to "unsubscribe" and use it to have yourself removed from their email list.</li>
+            <li>Email customer support and ask them to use this service to validate email addresses.</li>
+         </ul>
+      </p>
+   </div>
 </div>
