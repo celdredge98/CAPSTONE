@@ -40,6 +40,7 @@
     </None>
     <None Include="wwwroot\css\Matrix.jpg" />
     <None Include="wwwroot\images\CanTheSpam.jpg" />
+    <None Include="wwwroot\robots.txt" />
   </ItemGroup>
 
 

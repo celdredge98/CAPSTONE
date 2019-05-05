@@ -3,7 +3,7 @@
 <head>
    <meta charset="utf-8" />
    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   <title>@ViewData["Title"] - CansTheSpam</title>
+   <title>@ViewData["Title"] - Cans The Spam</title>
 
    @await Html.PartialAsync("_PageMetadataPartial")
 
@@ -22,7 +22,7 @@
 <body>
    <header>
       <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-         <div class="container">
+         <div class="container-fluid">
             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">CanTheSpam</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -32,26 +32,50 @@
                <partial name="_LoginPartial" />
                <ul class="navbar-nav flex-grow-1">
                   <li class="nav-item">
-                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Faq">FAQ</a>
                   </li>
                   <li class="nav-item">
-                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a>
                   </li>
                </ul>
             </div>
          </div>
       </nav>
    </header>
-   <div class="container-fluid">
+
+   <div class="container-fluid body-content">
       <partial name="_CookieConsentPartial" />
-      <main role="main" class="pb-3">
-         @RenderBody()
-      </main>
+      <div class="row">
+         <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 text-center text-sm-center text-md-center text-lg-center text-xl-center">
+            Top Advertisment goes here.
+         </div>
+      </div>
+      <div class="row">
+         <div class="col-1 col-sm-1 col-md-1 col-lg-1 col-xl-1">
+            @*Intentionally left blank*@
+         </div>
+         <div class="col-10 col-sm-10 col-md-10 col-lg-10 col-xl-10">
+            <main role="main" class="pb-3">
+               @RenderBody()
+            </main>
+         </div>
+         <div class="col-1 col-sm-1 col-md-1 col-lg-1 col-xl-1">
+            Side Advertisment goes here.
+         </div>
+      </div>
+      <div class="row">
+         <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 text-center text-sm-center text-md-center text-lg-center text-xl-center">
+            Bottom Advertisment goes here.
+         </div>
+      </div>
    </div>
 
    <footer class="border-top footer text-muted">
-      <div class="container">
-         &copy; 2019 - CansTheSpam - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+      <div class="container-fluid small">
+         &copy; @DateTime.Now.Year - <a href="http://www.CansTheSpam.com" target="_blank">Cans The Spam.</a> -
+         <a class="btn-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a> |
+         <a class="btn-link" asp-area="" asp-controller="Home" asp-action="TermsOfUse">Terms of Use</a> |
+         <a class="btn-link" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a>
       </div>
    </footer>
 
@@ -75,8 +99,13 @@
    </environment>
    <script src="~/js/site.js" asp-append-version="true"></script>
 
+   @await Html.PartialAsync("_BingTracker")
+
+   @await Html.PartialAsync("_FacebookTracker")
 
    @await Html.PartialAsync("_GoogleTrackerPartial")
+
+   @await Html.PartialAsync("_TwitterTracker")
 
    @RenderSection("Scripts", required: false)
 </body>

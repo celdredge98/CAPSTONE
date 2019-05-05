@@ -31,6 +31,14 @@ namespace CanTheSpam.Controllers.Web
          return View();
       }
 
+      public IActionResult Contact()
+      {
+         _logger.LogDebug($"{GetType().Name}.{nameof(Contact)} method called...");
+
+         return View();
+      }
+
+
       public IActionResult Privacy()
       {
          _logger.LogDebug($"{GetType().Name}.{nameof(Privacy)} method called...");
@@ -38,10 +46,24 @@ namespace CanTheSpam.Controllers.Web
          return View();
       }
 
+      public IActionResult TermsOfUse()
+      {
+         _logger.LogDebug($"{GetType().Name}.{nameof(TermsOfUse)} method called...");
+
+         return View();
+      }
+
+      public IActionResult Faq()
+      {
+         _logger.LogDebug($"{GetType().Name}.{nameof(Faq)} method called...");
+
+         return View();
+      }
+
       [HttpPost]
       public IActionResult ValidateEmail(UserEmailDetails userEmail)
       {
-         _logger.LogDebug($"{GetType().Name}.{nameof(Privacy)} method called...");
+         _logger.LogDebug($"{GetType().Name}.{nameof(ValidateEmail)}-Post method called...");
 
          // Form post control handler
 
@@ -69,7 +91,7 @@ namespace CanTheSpam.Controllers.Web
       [HttpGet]
       public IActionResult ValidateEmail([FromQuery] string e, [FromQuery] string v)
       {
-         _logger.LogDebug($"{GetType().Name}.{nameof(ValidateEmail)} method called...");
+         _logger.LogDebug($"{GetType().Name}.{nameof(ValidateEmail)}-Get method called...");
 
          // get control handler
 
@@ -90,32 +112,32 @@ namespace CanTheSpam.Controllers.Web
       [HttpPost]
       public IActionResult EmailCapture(UserEmailDetails userEmail)
       {
-          _logger.LogDebug($"{GetType().Name}.{nameof(EmailCapture)} method called...");
+         _logger.LogDebug($"{GetType().Name}.{nameof(EmailCapture)} method called...");
 
-          if (!string.IsNullOrEmpty(userEmail?.Email))
-          {
-                EmailList emailListItem = new EmailList()
-                {
-                    Id = Guid.NewGuid(),
-                    Email = userEmail.Email,
-                    IsValidated = false,
-                    DateCreated = DateTime.UtcNow
-                };
+         if (!string.IsNullOrEmpty(userEmail?.Email))
+         {
+            EmailList emailListItem = new EmailList()
+            {
+               Id = Guid.NewGuid(),
+               Email = userEmail.Email,
+               IsValidated = false,
+               DateCreated = DateTime.UtcNow
+            };
 
-                _emailListRepository.Add(emailListItem);
-                _unitOfWork.Save();
+            _emailListRepository.Add(emailListItem);
+            _unitOfWork.Save();
 
-            }
+         }
 
-            return View();
+         return View();
       }
 
       [HttpGet]
       public IActionResult ThankYou([FromQuery] string e)
       {
-          _logger.LogDebug($"{GetType().Name}.{nameof(ThankYou)} method called...");
+         _logger.LogDebug($"{GetType().Name}.{nameof(ThankYou)} method called...");
 
-          return View();
+         return View();
       }
 
       [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

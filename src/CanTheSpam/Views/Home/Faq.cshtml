@@ -1,0 +1,80 @@
+﻿@{
+   ViewData["Title"] = "FAQ";
+   string currentUrl = $"{(Context.Request.IsHttps ? "https://" : "http://")}{Context.Request.Host}" + "/swagger";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<ul class="list-group">
+   <li class="list-group-item list-group-item-info">
+      <p>How do you currently pay for your service?</p>
+      <ul class="list-group">
+         <li class="list-group-item">
+            <p>
+               We currently pay for our services through advertising on our site, additionally, we are open to donations and crowd funding to keep the service alive.
+               If you wish to contribute to the service please contact us at <a href="mailto:support@CansTheSpam.com?subject=Donations">support@CansTheSpam.com</a>.
+            </p>
+         </li>
+      </ul>
+   </li>
+   <li class="list-group-item list-group-item-info">
+      <p>What do you do with the email addresses you collect?</p>
+      <ul class="list-group">
+         <li class="list-group-item">
+            <p>We store them in our database and allow companies to verify their email addresses vs. our database.</p>
+         </li>
+      </ul>
+   </li>
+   <li class="list-group-item list-group-item-info">
+      <p>Do you share your email list directly with other companies?</p>
+      <ul class="list-group">
+         <li class="list-group-item">
+            <p>We do not directly share the email list with companies, organizations, or individuals at this time.</p>
+         </li>
+      </ul>
+   </li>
+   <li class="list-group-item list-group-item-info">
+      <p>If I give you my email address how does a company know I don't want to be on their list?</p>
+      <ul class="list-group">
+         <li class="list-group-item">
+            <p>
+               Our service doesn't directly tell companies to remove you from their email list. If you want to be removed from
+               someone's email list, provided they are a reputable company, you need to use their direct "opt out" email link provided in the
+               email they sent you.
+            </p>
+         </li>
+      </ul>
+   </li>
+   <li class="list-group-item list-group-item-info">
+      <p>How does your service work?</p>
+      <ul class="list-group">
+         <li class="list-group-item">
+            <p>
+               Our service provides businesses, organizations, and individuals a way to know that you do not want to
+               solicited through email. Before they send you an email message they can check to see if your email is in our
+               database. We return, in effect, a "Yes" or "No" indicating that you have registered your email address with us.
+            </p>
+         </li>
+      </ul>
+   </li>
+   <li class="list-group-item list-group-item-info">
+      <p>How do I use your service to check if the person doesn't want to be contacted?</p>
+      <ul class="list-group">
+         <li class="list-group-item">
+            <p>
+               If you are a business, organization, or individual that wishes to validate if someone on your list has requested not to be
+               solicited you must first create an account with us and register.
+            </p>
+         </li>
+         <li class="list-group-item">
+            <p>
+               Once your registration is confirmed we will provide an API access key to our services. You will use this API key which will provide
+               a JWT.
+            </p>
+         </li>
+         <li class="list-group-item">
+            <p>Service API can be found at <a href="@currentUrl">@currentUrl</a>.</p>
+         </li>
+      </ul>
+   </li>
+</ul>
