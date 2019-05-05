@@ -7,6 +7,7 @@
     <UserSecretsId>ff3a6f29-64e4-4cb8-8e32-0be8c903af87</UserSecretsId>
     <RootNamespace>CanTheSpam</RootNamespace>
     <Configurations>Debug;Release;Docker;Azure</Configurations>
+    <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -45,7 +46,7 @@
   <ItemGroup>
     <PackageReference Include="bootstrap" Version="4.3.1" />
     <PackageReference Include="Captcha" Version="4.4.1" />
-    <PackageReference Include="jQuery" Version="3.3.1" />
+    <PackageReference Include="jQuery" Version="3.4.1" />
     <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.TagHelpers" Version="2.2.0" />
@@ -56,10 +57,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.5.4" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.7.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Sendgrid" Version="9.11.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
   </ItemGroup>
 
 
@@ -73,5 +75,22 @@
       <TransformOnBuild>true</TransformOnBuild>
     </Content>
   </ItemGroup>
+
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Azure'">
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptJSXEmit>React</TypeScriptJSXEmit>
+    <TypeScriptModuleKind />
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptRemoveComments>False</TypeScriptRemoveComments>
+    <TypeScriptOutFile />
+    <TypeScriptOutDir />
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptSourceMap>True</TypeScriptSourceMap>
+    <TypeScriptMapRoot />
+    <TypeScriptSourceRoot />
+  </PropertyGroup>
 
 </Project>

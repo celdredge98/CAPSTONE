@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using CanTheSpam.Log4Net.Data;
 using CanTheSpam.Log4Net.Extensions;
 using CanTheSpam.Data.CanTheSpamRepository.Interfaces;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace CanTheSpam
 {
@@ -70,6 +71,12 @@ namespace CanTheSpam
             .AddEntityFrameworkStores<UserDbContext>();
 
          services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+         // Register the Swagger generator, defining 1 or more Swagger documents
+         services.AddSwaggerGen(c =>
+         {
+            c.SwaggerDoc("v1", new Info { Title = "Can The Spam API", Version = "v1" });
+         });
       }
 
       // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -116,6 +123,16 @@ namespace CanTheSpam
          app.UseCookiePolicy();
 
          app.UseAuthentication();
+
+         // Enable middleware to serve generated Swagger as a JSON endpoint.
+         app.UseSwagger();
+
+         // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
+         // specifying the Swagger JSON endpoint.
+         app.UseSwaggerUI(c =>
+         {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Can The Spam API V1");
+         });
 
          app.UseMvc(routes =>
          {

@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using CanTheSpam.Models;
-using System.Threading.Tasks;
 using CanTheSpam.Data.CanTheSpamRepository;
 using CanTheSpam.Data.CanTheSpamRepository.Interfaces;
 using CanTheSpam.Data.CanTheSpamRepository.Models;
 using CanTheSpam.Data.Repository.Interfaces;
-using CanTheSpam.Extensions;
+using CanTheSpam.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
-namespace CanTheSpam.Controllers
+namespace CanTheSpam.Controllers.Web
 {
    public class HomeController : Controller
    {
