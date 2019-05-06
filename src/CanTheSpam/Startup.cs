@@ -24,7 +24,7 @@ namespace CanTheSpam
    {
       public IConfiguration Configuration { get; }
       public IHostingEnvironment Environment { get; }
-      
+
       public Startup(IHostingEnvironment env)
       {
          IConfigurationBuilder builder = new ConfigurationBuilder()
@@ -69,10 +69,11 @@ namespace CanTheSpam
 
          services.Configure<RecaptchaSettings>(Configuration.GetSection("RecaptchaSettings"));
          services.AddTransient<IRecaptchaService, RecaptchaService>();
+         //services.AddSingleton<IConfiguration, this.Configuration>();
 
-            services.AddDefaultIdentity<IdentityUser>()
-            .AddDefaultUI(UIFramework.Bootstrap4)
-            .AddEntityFrameworkStores<UserDbContext>();
+         services.AddDefaultIdentity<IdentityUser>()
+         .AddDefaultUI(UIFramework.Bootstrap4)
+         .AddEntityFrameworkStores<UserDbContext>();
 
          services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 

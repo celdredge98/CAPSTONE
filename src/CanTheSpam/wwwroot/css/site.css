@@ -4,14 +4,7 @@ for details on configuring this project to bundle and minify static web assets. 
 
 body, html {
     height: 100%;
-}
-
-.bg {
-    background-image: url("Matrix.jpg");
-    height: 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
+    background-color: lightgrey;
 }
 
 a.navbar-brand {

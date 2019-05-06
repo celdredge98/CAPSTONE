@@ -7,8 +7,11 @@ using CanTheSpam.Data.CanTheSpamRepository.Models;
 using CanTheSpam.Data.Repository.Interfaces;
 using CanTheSpam.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using reCAPTCHA.AspNetCore;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace CanTheSpam.Controllers.Web
 {
@@ -17,15 +20,18 @@ namespace CanTheSpam.Controllers.Web
       private readonly IUnitOfWork _unitOfWork;
       private readonly IEmailListRepository _emailListRepository;
       private readonly IRecaptchaService _recaptcha;
+      private readonly IConfiguration _config;
 
       private readonly ILogger<HomeController> _logger;
 
       public HomeController(ILogger<HomeController> logger,
          IRecaptchaService recaptcha,
+         IConfiguration config,
          IUnitOfWork unitOfWork)
       {
          _logger = logger;
          _recaptcha = recaptcha;
+         _config = config;
          _unitOfWork = unitOfWork;
          _emailListRepository = new EmailListRepository(_unitOfWork);
       }
@@ -82,7 +88,6 @@ namespace CanTheSpam.Controllers.Web
          {
             if (!string.IsNullOrEmpty(userEmail?.Email))
             {
-               // if userEmail.Email = "RandomValue@example.com" not in the database "emailItem" == null
                EmailList emailItem = _emailListRepository.GetEntityByEmail(userEmail.Email);
                if (emailItem != null)
                {
@@ -90,10 +95,6 @@ namespace CanTheSpam.Controllers.Web
                }
             }
          }
-         // Check for robots using captcha
-         //    IF Not Robot continue on
-         //    ELSE Robot Goto I hate robot's page --> Page redirect -- Log IP Address, Log in Robot submitted Email table
-         // Save email in database
          // mark email with tentative approval pending validation
          // Send email to user using provided email address with "Magic" link to prove ownership
          // User can use the link from email to validate and then it redirects to "Thank you page"
@@ -117,8 +118,6 @@ namespace CanTheSpam.Controllers.Web
             EmailList emailItem = _emailListRepository.GetEntityByEmail(e);
             ViewData["Email"] = emailItem.Email;
          }
-         // IF email link used and is valid automatically redirect to "Thank You" page
-         // ELSE stay on page and report error to use that it failed to validate and try again.
 
          return View();
       }
@@ -154,6 +153,23 @@ namespace CanTheSpam.Controllers.Web
                      _emailListRepository.Add(emailListItem);
                      _unitOfWork.Save();
 
+                     SendGridClient sendGridClient = new SendGridClient(_config["AppSettings:SendGridKey"]);
+
+                     EmailAddress from = new EmailAddress("support@cansthespam.com");
+                     EmailAddress to = new EmailAddress("celdredge98@gmail.com");
+
+                     SendGridMessage msg = MailHelper.CreateSingleEmail(from, to, $"Test Email Message", $"email body content{emailListItem.Id} with email of: {userEmail.Email}", $"email body content{emailListItem.Id}  with email of: {userEmail.Email}");
+                     Response response = await sendGridClient.SendEmailAsync(msg);
+
+                     switch (response.StatusCode)
+                     {
+                        case System.Net.HttpStatusCode.Accepted:
+                           // Process Accepted complete the method and return
+                           break;
+                        default:
+                            _logger.LogError($"Sendgrid Response: {response.StatusCode}");
+                           break;
+                     }
                   }
 
                   ViewData["Email"] = $"{userEmail.Email} - Success: {recaptcha.success}";
