@@ -36,11 +36,64 @@ namespace CanTheSpam.Controllers.Web
          _emailListRepository = new EmailListRepository(_unitOfWork);
       }
 
+      [HttpGet]
       public IActionResult Index()
       {
          _logger.LogDebug($"{GetType().Name}.{nameof(Index)} method called...");
 
          return View();
+      }
+
+      [HttpPost]
+      public async Task<IActionResult> Index(UserEmailDetails userEmail)
+      {
+         _logger.LogDebug($"{GetType().Name}.{nameof(Index)} method called...");
+
+         RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
+
+         if (!recaptcha.success)
+         {
+            ViewData["Email"] = $"{userEmail.Email} - Success: {recaptcha.success}";
+            ModelState.AddModelError("", "There was an error validating recatpcha. Please try again!");
+         }
+         else
+         {
+            if (!string.IsNullOrEmpty(userEmail?.Email))
+            {
+               EmailList emailListItem = new EmailList()
+               {
+                  Id = Guid.NewGuid(),
+                  Email = userEmail.Email,
+                  IsValidated = false,
+                  DateCreated = DateTime.UtcNow
+               };
+
+               _emailListRepository.Add(emailListItem);
+               _unitOfWork.Save();
+
+               SendGridClient sendGridClient = new SendGridClient(_config["AppSettings:SendGridKey"]);
+
+               EmailAddress from = new EmailAddress("support@cansthespam.com");
+               EmailAddress to = new EmailAddress("celdredge98@gmail.com");
+
+               SendGridMessage msg = MailHelper.CreateSingleEmail(from, to, $"Test Email Message", $"email body content{emailListItem.Id} with email of: {userEmail.Email}", $"email body content{emailListItem.Id}  with email of: {userEmail.Email}");
+               Response response = await sendGridClient.SendEmailAsync(msg);
+
+               switch (response.StatusCode)
+               {
+                  case System.Net.HttpStatusCode.Accepted:
+                     // Process Accepted complete the method and return
+                     break;
+                  default:
+                     _logger.LogError($"Sendgrid Response: {response.StatusCode}");
+                     break;
+               }
+
+               ViewData["Email"] = $"{userEmail.Email}";
+            }
+         }
+
+         return Redirect($"/Home/ValidateEmail");
       }
 
       public IActionResult Contact()
@@ -73,28 +126,24 @@ namespace CanTheSpam.Controllers.Web
       }
 
       [HttpPost]
-      public async Task<IActionResult> ValidateEmail(UserEmailDetails userEmail)
+      public async Task<IActionResult> ValidateEmail(ValidateUserEmail userEmail)
       {
          _logger.LogDebug($"{GetType().Name}.{nameof(ValidateEmail)}-Post method called...");
 
-         RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
-
-         if (!recaptcha.success)
+         if (!string.IsNullOrEmpty(userEmail?.Email))
          {
-            ViewData["Email"] = $"{userEmail.Email} - Success: {recaptcha.success}";
-            ModelState.AddModelError("", "There was an error validating recatpcha. Please try again!");
-         }
-         else
-         {
-            if (!string.IsNullOrEmpty(userEmail?.Email))
+            EmailList emailItem = await _emailListRepository.GetEntityByEmailAsync(userEmail.Email);
+            if (emailItem != null /*&& emailItem.Id.ToString().Equals(userEmail.Email, StringComparison.InvariantCultureIgnoreCase)*/)
             {
-               EmailList emailItem = _emailListRepository.GetEntityByEmail(userEmail.Email);
-               if (emailItem != null)
-               {
-                  ViewData["Email"] = $"{emailItem.Email} - Success: {recaptcha.success}";
-               }
+               emailItem.IsValidated = true;
+               _emailListRepository.Update(emailItem);
+               _unitOfWork.Save();
             }
          }
+
+         //truncate table dbo.EmailList
+
+
          // mark email with tentative approval pending validation
          // Send email to user using provided email address with "Magic" link to prove ownership
          // User can use the link from email to validate and then it redirects to "Thank you page"
@@ -122,63 +171,7 @@ namespace CanTheSpam.Controllers.Web
          return View();
       }
 
-      [HttpPost]
-      public async Task<IActionResult> EmailCapture(UserEmailDetails userEmail)
-      {
-         _logger.LogDebug($"{GetType().Name}.{nameof(EmailCapture)} method called...");
 
-         RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
-
-         if (!recaptcha.success)
-         {
-            ViewData["Email"] = $"{userEmail.Email} - Success: {recaptcha.success}";
-            ModelState.AddModelError("", "There was an error validating recatpcha. Please try again!");
-         }
-         else
-         {
-            if (!string.IsNullOrEmpty(userEmail?.Email))
-            {
-               if (userEmail != null)
-               {
-                  if (!string.IsNullOrEmpty(userEmail?.Email))
-                  {
-                     EmailList emailListItem = new EmailList()
-                     {
-                        Id = Guid.NewGuid(),
-                        Email = userEmail.Email,
-                        IsValidated = false,
-                        DateCreated = DateTime.UtcNow
-                     };
-
-                     _emailListRepository.Add(emailListItem);
-                     _unitOfWork.Save();
-
-                     SendGridClient sendGridClient = new SendGridClient(_config["AppSettings:SendGridKey"]);
-
-                     EmailAddress from = new EmailAddress("support@cansthespam.com");
-                     EmailAddress to = new EmailAddress("celdredge98@gmail.com");
-
-                     SendGridMessage msg = MailHelper.CreateSingleEmail(from, to, $"Test Email Message", $"email body content{emailListItem.Id} with email of: {userEmail.Email}", $"email body content{emailListItem.Id}  with email of: {userEmail.Email}");
-                     Response response = await sendGridClient.SendEmailAsync(msg);
-
-                     switch (response.StatusCode)
-                     {
-                        case System.Net.HttpStatusCode.Accepted:
-                           // Process Accepted complete the method and return
-                           break;
-                        default:
-                            _logger.LogError($"Sendgrid Response: {response.StatusCode}");
-                           break;
-                     }
-                  }
-
-                  ViewData["Email"] = $"{userEmail.Email} - Success: {recaptcha.success}";
-               }
-            }
-         }
-
-         return View();
-      }
 
       [HttpGet]
       public IActionResult ThankYou([FromQuery] string e)

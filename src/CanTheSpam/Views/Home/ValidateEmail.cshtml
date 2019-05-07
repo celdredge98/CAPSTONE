@@ -1,13 +1,20 @@
-﻿@model UserEmailDetails
+﻿@model CanTheSpam.Models.ValidateUserEmail
 
 @{
-    ViewData["Title"] = "Validate Email";
+   ViewData["Title"] = "Validate Email";
 }
 
-    <h2>@ViewData["Email"]</h2>
+<h2>@ViewData["Email"]</h2>
 
-// Need validation text box on page (free form text string)
-// need button to click
-
-
-   
+<div class="row">
+   <div class="col-4 col-sm-4 col-md-4 col-lg-4 col-xl-4 offset-4 offset-sm-4 offset-md-4 offset-lg-4 offset-xl-4">
+      <div class="form-group">
+         <form class="form-inline" asp-controller="Home" asp-action="ValidateEmail" method="post">
+            <label asp-for="Email" style="font-size: x-large; font-weight: bolder;" class="col-form-label">Email:&nbsp;&nbsp;</label>
+            <input id="UserEmail" type="email" class="form-control" asp-for="Email" required placeholder="email@example.com" />
+            &nbsp;&nbsp;
+            <input type="submit" id="btnSubmit" class="btn btn-primary" value="Submit" />
+         </form>
+      </div>
+   </div>
+</div>
