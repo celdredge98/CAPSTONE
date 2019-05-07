@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using System.Web;
 using CanTheSpam.Data.CanTheSpamRepository;
 using CanTheSpam.Data.CanTheSpamRepository.Interfaces;
 using CanTheSpam.Data.CanTheSpamRepository.Models;
@@ -71,23 +73,7 @@ namespace CanTheSpam.Controllers.Web
                _emailListRepository.Add(emailListItem);
                _unitOfWork.Save();
 
-               SendGridClient sendGridClient = new SendGridClient(_config["AppSettings:SendGridKey"]);
-
-               EmailAddress from = new EmailAddress("support@cansthespam.com");
-               EmailAddress to = new EmailAddress("celdredge98@gmail.com");
-
-               SendGridMessage msg = MailHelper.CreateSingleEmail(from, to, $"Test Email Message", $"email body content{emailListItem.Id} with email of: {userEmail.Email}", $"email body content{emailListItem.Id}  with email of: {userEmail.Email}");
-               Response response = await sendGridClient.SendEmailAsync(msg);
-
-               switch (response.StatusCode)
-               {
-                  case System.Net.HttpStatusCode.Accepted:
-                     // Process Accepted complete the method and return
-                     break;
-                  default:
-                     _logger.LogError($"Sendgrid Response: {response.StatusCode}");
-                     break;
-               }
+               bool status = await SendEmailMessage(emailListItem.Id, emailListItem.Email);
 
                ViewData["Email"] = $"{userEmail.Email}";
             }
@@ -171,7 +157,16 @@ namespace CanTheSpam.Controllers.Web
          return View();
       }
 
+      [HttpGet]
+      public async Task<IActionResult> ResendEmail([FromQuery] string e)
+      {
+         if (await SendEmailMessage(Guid.Empty, e))
+         {
+            return Json(new { Status = "Success", Email = e});
+         }
 
+         return Json(new { Status = "Failure", Email = e });
+      }
 
       [HttpGet]
       public IActionResult ThankYou([FromQuery] string e)
@@ -187,6 +182,29 @@ namespace CanTheSpam.Controllers.Web
          _logger.LogDebug($"{GetType().Name}.{nameof(Error)} method called...");
 
          return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+      }
+
+      private async Task<bool> SendEmailMessage(Guid id, string userEmail)
+      {
+         SendGridClient sendGridClient = new SendGridClient(_config["AppSettings:SendGridKey"]);
+
+         EmailAddress from = new EmailAddress("support@cansthespam.com");
+         EmailAddress to = new EmailAddress(HttpUtility.UrlDecode(userEmail));
+
+         SendGridMessage msg = MailHelper.CreateSingleEmail(from, to, $"Test Email Message", $"email body content{id} with email of: {userEmail}", $"email body content{userEmail}  with email of: {userEmail}");
+         Response response = await sendGridClient.SendEmailAsync(msg);
+
+         switch (response.StatusCode)
+         {
+            case System.Net.HttpStatusCode.Accepted:
+               // Process Accepted complete the method and return
+               break;
+            default:
+               _logger.LogError($"Sendgrid Response: {response.StatusCode}");
+               return false;
+         }
+
+         return true;
       }
    }
 }
