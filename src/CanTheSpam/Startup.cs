@@ -49,8 +49,6 @@ namespace CanTheSpam
 
          services.AddDbContext<Log4NetDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Log4NetConnection")));
          services.AddDbContext<UserDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("AppConnection")));
-         //services.AddDbContext<CanTheSpamContext>(options => options.UseSqlServer(Configuration.GetConnectionString("AppConnection")));
-
          services.AddEntityFrameworkSqlServer()
             .AddDbContext<CanTheSpamContext>(options =>
                {

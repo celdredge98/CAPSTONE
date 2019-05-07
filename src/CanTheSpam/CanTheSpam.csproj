@@ -6,7 +6,7 @@
     <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
     <UserSecretsId>ff3a6f29-64e4-4cb8-8e32-0be8c903af87</UserSecretsId>
     <RootNamespace>CanTheSpam</RootNamespace>
-    <Configurations>Debug;Release;Docker;Azure</Configurations>
+    <Configurations>Debug;Release;Docker;Azure;Development</Configurations>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
   </PropertyGroup>
 
@@ -25,6 +25,7 @@
     <None Include="appsettings.Azure.json">
       <IsTransformFile>true</IsTransformFile>
       <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Include="appsettings.Debug.json">
       <IsTransformFile>true</IsTransformFile>
@@ -74,6 +75,7 @@
   <ItemGroup>
     <Content Update="appsettings.json">
       <TransformOnBuild>true</TransformOnBuild>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 

@@ -13,6 +13,7 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Azure|Any CPU = Azure|Any CPU
 		Debug|Any CPU = Debug|Any CPU
+		Development|Any CPU = Development|Any CPU
 		Docker|Any CPU = Docker|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
@@ -21,6 +22,8 @@ Global
 		{AB406A8E-C85A-4BB5-919F-9FFE90266135}.Azure|Any CPU.Build.0 = Azure|Any CPU
 		{AB406A8E-C85A-4BB5-919F-9FFE90266135}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AB406A8E-C85A-4BB5-919F-9FFE90266135}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB406A8E-C85A-4BB5-919F-9FFE90266135}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{AB406A8E-C85A-4BB5-919F-9FFE90266135}.Development|Any CPU.Build.0 = Development|Any CPU
 		{AB406A8E-C85A-4BB5-919F-9FFE90266135}.Docker|Any CPU.ActiveCfg = Docker|Any CPU
 		{AB406A8E-C85A-4BB5-919F-9FFE90266135}.Docker|Any CPU.Build.0 = Docker|Any CPU
 		{AB406A8E-C85A-4BB5-919F-9FFE90266135}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -29,6 +32,8 @@ Global
 		{92F654A3-4682-4930-8B1C-992B40F79908}.Azure|Any CPU.Build.0 = Azure|Any CPU
 		{92F654A3-4682-4930-8B1C-992B40F79908}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{92F654A3-4682-4930-8B1C-992B40F79908}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92F654A3-4682-4930-8B1C-992B40F79908}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{92F654A3-4682-4930-8B1C-992B40F79908}.Development|Any CPU.Build.0 = Development|Any CPU
 		{92F654A3-4682-4930-8B1C-992B40F79908}.Docker|Any CPU.ActiveCfg = Debug|Any CPU
 		{92F654A3-4682-4930-8B1C-992B40F79908}.Docker|Any CPU.Build.0 = Debug|Any CPU
 		{92F654A3-4682-4930-8B1C-992B40F79908}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -39,6 +44,9 @@ Global
 		{75000631-1687-437E-BAA6-2821C508423F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{75000631-1687-437E-BAA6-2821C508423F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75000631-1687-437E-BAA6-2821C508423F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{75000631-1687-437E-BAA6-2821C508423F}.Development|Any CPU.ActiveCfg = Development|Any CPU
+		{75000631-1687-437E-BAA6-2821C508423F}.Development|Any CPU.Build.0 = Development|Any CPU
+		{75000631-1687-437E-BAA6-2821C508423F}.Development|Any CPU.Deploy.0 = Development|Any CPU
 		{75000631-1687-437E-BAA6-2821C508423F}.Docker|Any CPU.ActiveCfg = Debug|Any CPU
 		{75000631-1687-437E-BAA6-2821C508423F}.Docker|Any CPU.Build.0 = Debug|Any CPU
 		{75000631-1687-437E-BAA6-2821C508423F}.Docker|Any CPU.Deploy.0 = Debug|Any CPU
