@@ -16,11 +16,16 @@
    }
 }
 
+   <div class="row">
+      <div style="max-height: 200px;" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 text-center text-sm-center text-md-center text-lg-center text-xl-center">
+         <img id="CanTheSpamLogo" src="~/images/CansTheSpamLogo.jpg" alt="Can The Spam Logo" title="Can The Spam" class="img-fluid" style="max-height: 160px; max-width: 160px;" />
+      </div>
+   </div>
 <div class="row">
    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
       <h2>@ViewData["Title"]</h2>
       <p>
-         An email was sent to the the following address <span style="font-size: x-large; font-weight: bolder;">@ViewData["Email"]</span>
+         An email was sent to the the following address <span style="font-size: x-large; font-weight: bolder;">@emailAddress</span>
          provided by you. You can click the link from the email or enter the code on this page.
          Once validated you will be directed to a Thank You page with additional helpful information.
          <button onclick="resendEmailMessage('@emailAddress')">Click Here to resend the email</button>
@@ -31,8 +36,9 @@
    <div class="col-4 col-sm-4 col-md-4 col-lg-4 col-xl-4 offset-4 offset-sm-4 offset-md-4 offset-lg-4 offset-xl-4">
       <div class="form-group">
          <form class="form-inline" asp-controller="Home" asp-action="ValidateEmail" method="post">
-            <label asp-for="Email" style="font-size: x-large; font-weight: bolder;" class="col-form-label">Email:&nbsp;&nbsp;</label>
-            <input id="UserEmail" type="email" class="form-control" asp-for="Email" required placeholder="email@example.com" />
+            <label asp-for="EmailCode" style="font-size: x-large; font-weight: bolder;" class="col-form-label">Validation Code:&nbsp;&nbsp;</label>
+            <input id="EmailCode" type="text" class="form-control" asp-for="EmailCode" />
+            <input id="Email" type="hidden" asp-for="Email" value="@emailAddress"/>
             &nbsp;&nbsp;
             <input type="submit" id="btnSubmit" class="btn btn-primary" value="Submit" />
          </form>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -15,6 +16,8 @@ using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using reCAPTCHA.AspNetCore;
 using SendGrid;
 using SendGrid.Helpers.Mail;
@@ -56,36 +59,65 @@ namespace CanTheSpam.Controllers.Web
       public async Task<IActionResult> Index(UserEmailDetails userEmail)
       {
          _logger.LogDebug($"{GetType().Name}.{nameof(Index)} method called...");
+         ViewData["ErrorMessage"] = string.Empty;
 
          RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
 
          if (!recaptcha.success)
          {
-            ViewData["Email"] = $"{userEmail.Email} - Success: {recaptcha.success}";
+            ViewData["ErrorMessage"] = $"There was an error validating recatpcha. Please try again!";
             ModelState.AddModelError("", "There was an error validating recatpcha. Please try again!");
+
+            return View();
          }
          else
          {
-            if (!string.IsNullOrEmpty(userEmail?.Email))
+            try
             {
-               EmailList emailListItem = new EmailList()
+               if (!string.IsNullOrEmpty(userEmail?.Email))
                {
-                  Id = Guid.NewGuid(),
-                  Email = userEmail.Email,
-                  IsValidated = false,
-                  DateCreated = DateTime.UtcNow
-               };
+                  EmailList emailListItem = new EmailList()
+                  {
+                     Id = Guid.NewGuid(),
+                     Email = userEmail.Email,
+                     IsValidated = false,
+                     DateCreated = DateTime.UtcNow
+                  };
 
-               _emailListRepository.Add(emailListItem);
-               _unitOfWork.Save();
+                  _emailListRepository.Add(emailListItem);
+                  _unitOfWork.Save();
 
-               bool status = await SendEmailMessage(emailListItem.Id, emailListItem.Email);
+                  if (!await SendEmailMessage(this.HttpContext, emailListItem.Id, emailListItem.Email))
+                  {
+                     ViewData["ErrorMessage"] = "Unable to send confirmation email";
+                     return View();
+                  }
 
-               ViewData["Email"] = $"{userEmail.Email}";
+                  this.HttpContext.Session.Set("Email", Encoding.UTF8.GetBytes(userEmail.Email));
+
+                  return Redirect($"/Home/ValidateEmail/?e={userEmail?.Email}");
+               }
+            }
+            catch (DbUpdateException edu)
+            {
+               _logger.LogError(edu, edu.Message);
+               ViewData["ErrorMessage"] = "This email has already been submitted.";
+            }
+            catch (SqlException esql)
+            {
+               _logger.LogError(esql, esql.Message);
+               if (esql.Message.ToLower().Contains("cannot insert duplicate key"))
+               {
+                  ViewData["ErrorMessage"] = "This email has already been submitted.";
+               }
+               else
+               {
+                  ViewData["ErrorMessage"] = "There was a critical failure saving to the database.";
+               }
             }
          }
-
-         return Redirect($"/Home/ValidateEmail");
+         
+         return View();
       }
 
       public IActionResult Contact()
@@ -117,6 +149,7 @@ namespace CanTheSpam.Controllers.Web
          return View();
       }
 
+      // From Page Form Post
       [HttpPost]
       public async Task<IActionResult> ValidateEmail(ValidateUserEmail userEmail)
       {
@@ -125,29 +158,51 @@ namespace CanTheSpam.Controllers.Web
          if (!string.IsNullOrEmpty(userEmail?.Email))
          {
             EmailList emailItem = await _emailListRepository.GetEntityByEmailAsync(userEmail.Email);
-            if (emailItem != null && emailItem.Id.ToString().Equals(userEmail.Email, StringComparison.InvariantCultureIgnoreCase))
+            if (emailItem != null && emailItem.Id.ToString().Equals(userEmail.EmailCode, StringComparison.InvariantCultureIgnoreCase))
             {
                emailItem.IsValidated = true;
                _emailListRepository.Update(emailItem);
                _unitOfWork.Save();
+
+               this.HttpContext.Session.Set("Email", Encoding.UTF8.GetBytes(emailItem.Email));
+
+               return Redirect($"/Home/ThankYou");
             }
          }
 
          return View();
       }
 
+      // From Email URL Link
       [HttpGet]
       public IActionResult ValidateEmail([FromQuery] string e, [FromQuery] string v)
       {
          _logger.LogDebug($"{GetType().Name}.{nameof(ValidateEmail)}-Get method called...");
 
-         if (!string.IsNullOrEmpty(e))
+         if (!string.IsNullOrEmpty(e) && !string.IsNullOrEmpty(v))
          {
-            // https://CansTheSpam.com/ValidateEmail?e=user@example.com&v=37AB7F39-CC4D-40DC-B113-DA9452501B1D ([HttpGet])
-            // https://CansTheSpam.com/ValidateEmail/?e=user@example.com&v=37AB7F39-CC4D-40DC-B113-DA9452501B1D ([HttpGet])
-
             EmailList emailItem = _emailListRepository.GetEntityByEmail(e);
-            ViewData["Email"] = emailItem.Email;
+
+            if (emailItem != null &&
+                emailItem.Email.Equals(e, StringComparison.InvariantCultureIgnoreCase) &&
+                emailItem.Id.ToString().Equals(v, StringComparison.InvariantCultureIgnoreCase))
+            {
+               emailItem.IsValidated = true;
+               _emailListRepository.Update(emailItem);
+               _unitOfWork.Save();
+
+               this.HttpContext.Session.Set("Email", Encoding.UTF8.GetBytes(emailItem.Email));
+
+               return Redirect($"/Home/ThankYou");
+            }
+         }
+         else if (!string.IsNullOrEmpty(e))
+         {
+            if (!string.IsNullOrEmpty(e))
+            {
+               EmailList emailItem = _emailListRepository.GetEntityByEmail(e);
+               this.HttpContext.Session.Set("Email", Encoding.UTF8.GetBytes(emailItem.Email));
+            }
          }
 
          return View();
@@ -156,9 +211,9 @@ namespace CanTheSpam.Controllers.Web
       [HttpGet]
       public async Task<IActionResult> ResendEmail([FromQuery] string e)
       {
-         if (await SendEmailMessage(Guid.Empty, e))
+         if (await SendEmailMessage(this.HttpContext, Guid.Empty, e))
          {
-            return Json(new { Status = "Success", Email = e});
+            return Json(new { Status = "Success", Email = e });
          }
 
          return Json(new { Status = "Failure", Email = e });
@@ -180,7 +235,7 @@ namespace CanTheSpam.Controllers.Web
          return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
       }
 
-      private async Task<bool> SendEmailMessage(Guid id, string userEmail)
+      private async Task<bool> SendEmailMessage(Microsoft.AspNetCore.Http.HttpContext httpContext, Guid id, string userEmail)
       {
          SendGridClient sendGridClient = new SendGridClient(_config["AppSettings:SendGridKey"]);
 
@@ -189,10 +244,13 @@ namespace CanTheSpam.Controllers.Web
 
          string emailTemplate = System.IO.File.ReadAllText($"{_hostingEnvironment.WebRootPath}\\SendGridTemplate.html", Encoding.UTF8);
          emailTemplate = emailTemplate.Replace("{{userEmail}}", userEmail);
-         emailTemplate = emailTemplate.Replace("{{appUrl}}", "");
+
+         emailTemplate = emailTemplate.Replace("{{appUrl}}",
+            $"{(httpContext.Request.IsHttps ? "https://" : "http://")}{httpContext.Request.Host}/Home/ValidateEmail/?e={userEmail}&v={id}");
+
          emailTemplate = emailTemplate.Replace("{{userCode}}", id.ToString());
 
-         SendGridMessage msg = MailHelper.CreateSingleEmail(from, to, $"Test Email Message", $"email body content{id} with email of: {userEmail}", $"email body content{userEmail}  with email of: {userEmail}");
+         SendGridMessage msg = MailHelper.CreateSingleEmail(from, to, "CansTheSpam.com - Confirm your email.", emailTemplate, emailTemplate);
          Response response = await sendGridClient.SendEmailAsync(msg);
 
          switch (response.StatusCode)
