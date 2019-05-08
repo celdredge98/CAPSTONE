@@ -1,7 +1,39 @@
-﻿
+﻿@using System.Text
+@using Microsoft.AspNetCore.Http
+@model CanTheSpam.Models.ValidateUserEmail
+
 @{
-    ViewData["Title"] = "ThankYou";
+   ViewData["Title"] = "Thank You";
 }
 
-<h1>ThankYou</h1>
+<div class="row">
+   <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 text-center">
+      <p>
+         <span style="font-size: xx-large; font-weight: bolder;">@ViewData["Title"]</span>
+      </p>
+      <p>
+         for adding your email and your voice to the Cans the Spam movement. We will continue to help advocate better email and advertising policies around the world!
+      </p>
+   </div>
+</div>
+
+<div class="row">
+   <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+      <p>
+         We would like to now offer some additional help and ideas on how to reduce spam on your own.
+      </p>
+      <ul>
+         <li class="list-group-item list-group-item-info">
+            <p>Some Really good question or statement?</p>
+            <ul class="list-group">
+               <li class="list-group-item">
+                  <p>
+                     Some Answer to help our customers.</a>.
+                  </p>
+               </li>
+            </ul>
+         </li>
+      </ul>
+   </div>
+</div>
 

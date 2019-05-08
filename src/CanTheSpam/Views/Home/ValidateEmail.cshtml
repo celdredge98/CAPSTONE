@@ -1,22 +1,28 @@
-﻿@using System.Text.Encodings.Web
-@using System.Web
+﻿@using System.Text
+@using Microsoft.AspNetCore.Http
 @model CanTheSpam.Models.ValidateUserEmail
 
 @{
    ViewData["Title"] = "Validate Email";
-   string activeUrl = $"{(Context.Request.IsHttps ? "https://" : "http://")}{Context.Request.Host}/ResendEmail";
-   string emailAddress = HttpUtility.UrlEncode($"{ViewData["Email"]}");
+
+   string emailAddress = string.Empty;
+   string activeUrl = string.Empty;
+
+   if (Context.Session.Keys.Contains("Email"))
+   {
+      byte[] emailBytes = Context.Session.Get("Email");
+      emailAddress = Encoding.UTF8.GetString(emailBytes, 0, emailBytes.Length);
+      activeUrl = $"{(Context.Request.IsHttps ? "https://" : "http://")}{Context.Request.Host}/Home/ResendEmail";
+   }
 }
 
 <div class="row">
-   <div class="col-4 col-sm-4 col-md-4 col-lg-4 col-xl-4 offset-4 offset-sm-4 offset-md-4 offset-lg-4 offset-xl-4">
+   <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
       <h2>@ViewData["Title"]</h2>
       <p>
          An email was sent to the the following address <span style="font-size: x-large; font-weight: bolder;">@ViewData["Email"]</span>
          provided by you. You can click the link from the email or enter the code on this page.
          Once validated you will be directed to a Thank You page with additional helpful information.
-      </p>
-      <p>
          <button onclick="resendEmailMessage('@emailAddress')">Click Here to resend the email</button>
       </p>
    </div>
@@ -35,11 +41,8 @@
 </div>
 
 <script>
-
-   $.getJSON('http://www.imdbapi.com/?' + dataString, function(json_data){
-      alert(JSON.stringify(json_data));
-   });
    function resendEmailMessage(email) {
+      console.log(email);
       $.getJSON('@activeUrl/?e=' + email, function (json_data) {
          console.log(json_data);
       });

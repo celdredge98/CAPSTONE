@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using System.Web;
@@ -8,6 +9,7 @@ using CanTheSpam.Data.CanTheSpamRepository.Interfaces;
 using CanTheSpam.Data.CanTheSpamRepository.Models;
 using CanTheSpam.Data.Repository.Interfaces;
 using CanTheSpam.Models;
+using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -70,12 +72,12 @@ namespace CanTheSpam.Controllers.Web
                   DateCreated = DateTime.UtcNow
                };
 
-               _emailListRepository.Add(emailListItem);
-               _unitOfWork.Save();
+               //_emailListRepository.Add(emailListItem);
+               //_unitOfWork.Save();
 
                bool status = await SendEmailMessage(emailListItem.Id, emailListItem.Email);
 
-               ViewData["Email"] = $"{userEmail.Email}";
+               this.HttpContext.Session.Set("Email", Encoding.UTF8.GetBytes(userEmail.Email));
             }
          }
 

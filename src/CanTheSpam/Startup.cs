@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using CanTheSpam.Data;
 using CanTheSpam.Data.CanTheSpamRepository;
 using CanTheSpam.Data.Repository.Interfaces;
@@ -73,6 +74,13 @@ namespace CanTheSpam
          .AddDefaultUI(UIFramework.Bootstrap4)
          .AddEntityFrameworkStores<UserDbContext>();
 
+         services.AddSession(options =>
+         {
+            options.IdleTimeout = TimeSpan.FromMinutes(60);
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+         });
+
          services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
          // Register the Swagger generator, defining 1 or more Swagger documents
@@ -137,6 +145,7 @@ namespace CanTheSpam
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "Can The Spam API V1");
          });
 
+         app.UseSession();
          app.UseMvc(routes =>
          {
             routes.MapRoute(name: "default", template: "{controller=Home}/{action=Index}/{id?}");
