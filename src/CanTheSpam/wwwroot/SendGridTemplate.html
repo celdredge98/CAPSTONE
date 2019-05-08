@@ -17,18 +17,20 @@
 
 </head>
 <body>
-    <p style="font-size: x-large; font-weight: bolder;">
-        Thank you for Submitting your email, Test1@test.com, to CansTheSpam.com.<br />
-        <br />
-        Please select the link below to confirm your email:<br />
-        <br />
-        https://somelink.com/asdgagras_agaewrg/<br />
-        <br />
-        If you did not submit your email to this site, please disregard this email.<br />
-        <br />
-        Thank you,<br />
-        Support@CansTheSpam.com
-    </p>
+   <p style="font-size: x-large; font-weight: bolder;">
+      Thank you for Submitting your email, {{userEmail}}, to CansTheSpam.com.<br />
+      <br />
+      Please select the link below to confirm your email:<br />
+      <br />
+      {{appUrl}}<br />
+      <br />
+      Or enter {{userCode}} into the open webpage.<br />
+      <br />
+      If you did not submit your email to this site, please disregard this email.<br />
+      <br />
+      Thank you,<br />
+      Support@CansTheSpam.com
+   </p>
 
    <!-- jQuery library -->
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
