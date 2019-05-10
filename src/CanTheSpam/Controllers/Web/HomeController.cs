@@ -2,21 +2,17 @@
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using System.Web;
-using System.IO;
 using CanTheSpam.Data.CanTheSpamRepository;
 using CanTheSpam.Data.CanTheSpamRepository.Interfaces;
 using CanTheSpam.Data.CanTheSpamRepository.Models;
 using CanTheSpam.Data.Repository.Interfaces;
 using CanTheSpam.Models;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using reCAPTCHA.AspNetCore;
 using SendGrid;
@@ -63,12 +59,12 @@ namespace CanTheSpam.Controllers.Web
 
          RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
 
+         IActionResult result = View();
+
          if (!recaptcha.success)
          {
-            ViewData["ErrorMessage"] = $"There was an error validating recatpcha. Please try again!";
-            ModelState.AddModelError("", "There was an error validating recatpcha. Please try again!");
-
-            return View();
+            ViewData["ErrorMessage"] = $"There was an error validating reCAPTCHA. Please try again!";
+            ModelState.AddModelError("", "There was an error validating reCAPTCHA. Please try again!");
          }
          else
          {
@@ -90,23 +86,24 @@ namespace CanTheSpam.Controllers.Web
                   if (!await SendEmailMessage(this.HttpContext, emailListItem.Id, emailListItem.Email))
                   {
                      ViewData["ErrorMessage"] = "Unable to send confirmation email";
-                     return View();
                   }
+                  else
+                  {
+                     this.HttpContext.Session.Set("Email", Encoding.UTF8.GetBytes(userEmail.Email));
 
-                  this.HttpContext.Session.Set("Email", Encoding.UTF8.GetBytes(userEmail.Email));
-
-                  return Redirect($"/Home/ValidateEmail/?e={userEmail?.Email}");
+                     result = Redirect($"/Home/ValidateEmail/?e={userEmail?.Email}");
+                  }
                }
             }
-            catch (DbUpdateException edu)
+            catch (DbUpdateException ex)
             {
-               _logger.LogError(edu, edu.Message);
+               _logger.LogError(ex, ex.Message);
                ViewData["ErrorMessage"] = "This email has already been submitted.";
             }
-            catch (SqlException esql)
+            catch (SqlException ex)
             {
-               _logger.LogError(esql, esql.Message);
-               if (esql.Message.ToLower().Contains("cannot insert duplicate key"))
+               _logger.LogError(ex, ex.Message);
+               if (ex.Message.ToLower().Contains("cannot insert duplicate key"))
                {
                   ViewData["ErrorMessage"] = "This email has already been submitted.";
                }
@@ -116,8 +113,8 @@ namespace CanTheSpam.Controllers.Web
                }
             }
          }
-         
-         return View();
+
+         return result;
       }
 
       public IActionResult Contact()
@@ -155,6 +152,8 @@ namespace CanTheSpam.Controllers.Web
       {
          _logger.LogDebug($"{GetType().Name}.{nameof(ValidateEmail)}-Post method called...");
 
+         IActionResult result = View();
+
          if (!string.IsNullOrEmpty(userEmail?.Email))
          {
             EmailList emailItem = await _emailListRepository.GetEntityByEmailAsync(userEmail.Email);
@@ -166,22 +165,24 @@ namespace CanTheSpam.Controllers.Web
 
                this.HttpContext.Session.Set("Email", Encoding.UTF8.GetBytes(emailItem.Email));
 
-               return Redirect($"/Home/ThankYou");
+               result = Redirect($"/Home/ThankYou");
             }
          }
 
-         return View();
+         return result;
       }
 
       // From Email URL Link
       [HttpGet]
-      public IActionResult ValidateEmail([FromQuery] string e, [FromQuery] string v)
+      public async Task<IActionResult> ValidateEmail([FromQuery] string e, [FromQuery] string v)
       {
          _logger.LogDebug($"{GetType().Name}.{nameof(ValidateEmail)}-Get method called...");
 
+         IActionResult result = View();
+
          if (!string.IsNullOrEmpty(e) && !string.IsNullOrEmpty(v))
          {
-            EmailList emailItem = _emailListRepository.GetEntityByEmail(e);
+            EmailList emailItem = await _emailListRepository.GetEntityByEmailAsync(e);
 
             if (emailItem != null &&
                 emailItem.Email.Equals(e, StringComparison.InvariantCultureIgnoreCase) &&
@@ -193,7 +194,7 @@ namespace CanTheSpam.Controllers.Web
 
                this.HttpContext.Session.Set("Email", Encoding.UTF8.GetBytes(emailItem.Email));
 
-               return Redirect($"/Home/ThankYou");
+               result = Redirect($"/Home/ThankYou");
             }
          }
          else if (!string.IsNullOrEmpty(e))
@@ -205,18 +206,36 @@ namespace CanTheSpam.Controllers.Web
             }
          }
 
-         return View();
+         return result;
       }
 
       [HttpGet]
       public async Task<IActionResult> ResendEmail([FromQuery] string e)
       {
-         if (await SendEmailMessage(this.HttpContext, Guid.Empty, e))
+         IActionResult result;
+         if (!string.IsNullOrEmpty(e))
          {
-            return Json(new { Status = "Success", Email = e });
+            EmailList emailListItem = await _emailListRepository.GetEntityByEmailAsync(e);
+
+            if (emailListItem != null && await SendEmailMessage(this.HttpContext, emailListItem.Id, e))
+            {
+               result = Json(new { Status = "Success", Email = e, Message = "Email send successful." });
+            }
+            else if(emailListItem == null)
+            {
+               result = Json(new { Status = "Failure", Email = e, Message = "Unable to find email in database." });
+            }
+            else
+            {
+               result = Json(new { Status = "Failure", Email = e, Message = "Failure to send email message." });
+            }
+         }
+         else
+         {
+            result = Json(new { Status = "Failure", Email = e, Message = "Query string was empty, no email provided." });
          }
 
-         return Json(new { Status = "Failure", Email = e });
+         return result;
       }
 
       [HttpGet]
