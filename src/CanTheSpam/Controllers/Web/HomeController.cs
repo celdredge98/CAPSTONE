@@ -146,6 +146,13 @@ namespace CanTheSpam.Controllers.Web
          return View();
       }
 
+      public IActionResult ApiAccess()
+      {
+         _logger.LogDebug($"{GetType().Name}.{nameof(ApiAccess)} method called...");
+
+         return View();
+      }
+
       // From Page Form Post
       [HttpPost]
       public async Task<IActionResult> ValidateEmail(ValidateUserEmail userEmail)

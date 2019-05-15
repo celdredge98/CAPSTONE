@@ -4,7 +4,7 @@
    {
       public static void Initialize(Log4NetDbContext context)
       {
-         context.Database.EnsureCreated();
+         //context.Database.EnsureCreated();
       }
    }
 }
